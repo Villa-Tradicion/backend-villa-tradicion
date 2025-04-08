@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClient } from '@prisma/client';
@@ -25,13 +25,19 @@ export class ProductsService extends PrismaClient{
       where: {id, available:true}
     });
 
-    if(!product) throw new HttpException('Producto no encontrado', HttpStatus.BAD_REQUEST);
+    if(!product) throw new NotFoundException(`Product with id ${id} not found`);
 
     return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, data: UpdateProductDto) {
+    
+    await this.findOne(id)
+    
+    return this.product.update({
+      where:{id},
+      data
+    })
   }
 
   remove(id: number) {

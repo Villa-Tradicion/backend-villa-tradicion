@@ -13,49 +13,49 @@ import {
 
 export class CreateProductDto {
   @IsString()
-  name: string;
+  public name: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(500, { message: 'La descripción no puede superar los 500 caracteres.' })
-  description?: string;
+  public description?: string;
 
   @IsNumber()
   @Min(0)
   @Type(() => Number)
-  price: number;
+  public price: number;
 
   @IsOptional()
   @IsBoolean()
-  available?: boolean;
+  public available?: boolean;
 
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  heightCm?: number;
+  public heightCm?: number;
 
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  widthCm?: number;
+  public widthCm?: number;
 
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
-  depthCm?: number;
+  public depthCm?: number;
 
   @IsArray()
   @IsString({ each: true })
-  materials: string[];
+  public materials: string[];
 
   @IsArray()
   @IsString({ each: true })
-  availableColors: string[];
+  public availableColors: string[];
 
   @IsOptional()
   @IsUrl()
-  imageUrl?: string;
+  public imageUrl?: string;
 
   @IsInt()
-  categoryId: number;
+  public categoryId: number;
 }
