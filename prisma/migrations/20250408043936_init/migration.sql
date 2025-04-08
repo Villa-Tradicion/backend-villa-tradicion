@@ -6,7 +6,7 @@ CREATE TYPE "OrderStatus" AS ENUM ('pending', 'shipped', 'delivered', 'cancelled
 
 -- CreateTable
 CREATE TABLE "Category" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
@@ -14,7 +14,7 @@ CREATE TABLE "Category" (
 
 -- CreateTable
 CREATE TABLE "Product" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "price" DOUBLE PRECISION NOT NULL,
@@ -22,12 +22,12 @@ CREATE TABLE "Product" (
     "heightCm" DOUBLE PRECISION,
     "widthCm" DOUBLE PRECISION,
     "depthCm" DOUBLE PRECISION,
-    "materials" TEXT,
+    "materials" TEXT[],
     "availableColors" TEXT[],
     "imageUrl" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "categoryId" TEXT NOT NULL,
+    "categoryId" INTEGER NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -76,7 +76,7 @@ CREATE TABLE "OrderDetail" (
     "quantity" INTEGER NOT NULL,
     "unitPrice" DOUBLE PRECISION NOT NULL,
     "orderId" TEXT NOT NULL,
-    "productId" BIGINT NOT NULL,
+    "productId" INTEGER NOT NULL,
 
     CONSTRAINT "OrderDetail_pkey" PRIMARY KEY ("id")
 );
@@ -87,7 +87,7 @@ CREATE TABLE "Review" (
     "rating" INTEGER NOT NULL,
     "comment" TEXT,
     "reviewDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "productId" BIGINT NOT NULL,
+    "productId" INTEGER NOT NULL,
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
