@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
@@ -55,6 +56,6 @@ export class CreateProductDto {
   @IsUrl()
   imageUrl?: string;
 
-  @IsString()
-  categoryId: string;
+  @IsInt()
+  categoryId: number;
 }

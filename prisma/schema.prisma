@@ -14,13 +14,13 @@ datasource db {
 }
 
 model Category {
-  id   String  @id @default(uuid())
-  name String  @unique
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
   products Product[]
 }
 
 model Product {
-  id              BigInt   @id @default(autoincrement())
+  id              Int   @id @default(autoincrement())
   name            String
   description     String?
   price           Float
@@ -34,7 +34,7 @@ model Product {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   category        Category @relation(fields: [categoryId], references: [id])
-  categoryId      String
+  categoryId      Int
   orderDetails    OrderDetail[]
   reviews         Review[]
 }
@@ -81,7 +81,7 @@ model OrderDetail {
   order     Order   @relation(fields: [orderId], references: [id])
   orderId   String
   product   Product @relation(fields: [productId], references: [id])
-  productId BigInt
+  productId Int
 }
 
 model Review {
@@ -90,7 +90,7 @@ model Review {
   comment    String?
   reviewDate DateTime @default(now())
   product    Product @relation(fields: [productId], references: [id])
-  productId  BigInt
+  productId  Int
   user       User    @relation(fields: [userId], references: [id])
   userId     String
 }
