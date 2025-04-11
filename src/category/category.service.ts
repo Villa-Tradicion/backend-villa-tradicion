@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaClient } from '@prisma/client';
@@ -14,7 +14,9 @@ export class CategoryService extends PrismaClient{
   }
   
   create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+    return this.category.create({
+      data: createCategoryDto
+    })
   }
 
   async findAll() {
@@ -26,8 +28,14 @@ export class CategoryService extends PrismaClient{
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(id: number) {
+    const category = await this.category.findFirst({
+      where: {id}
+    });
+
+    if(!category) throw new NotFoundException(`Categoria ${category.name} con id: ${id} no fue encontrado`);
+    
+    return category
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
