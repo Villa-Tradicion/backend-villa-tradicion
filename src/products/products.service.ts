@@ -18,13 +18,19 @@ export class ProductsService extends PrismaClient{
 
   async findAll() {
     return await this.product.findMany({
-      where: {available:true}
+      where: {available:true},
+      include:{
+        category: true
+      }
     });
   }
 
   async findOne(id: number) {
     const product = await this.product.findFirst({
-      where: {id, available:true}
+      where: {id, available:true},
+      include:{
+        category: true
+      }
     });
 
     if(!product) throw new NotFoundException(`Producto con id: ${id} no fue encontrado`);
@@ -51,7 +57,7 @@ export class ProductsService extends PrismaClient{
         available: false
       }
     });
-    console.log('Soft deleted product:', product);
+    // console.log('Soft deleted product:', product);
     return product
   }
 }
