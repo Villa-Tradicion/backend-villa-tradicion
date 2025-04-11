@@ -1,20 +1,17 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaClient } from '@prisma/client';
 import { CategoryService } from 'src/category/category.service';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
 @Injectable()
-export class ProductsService extends PrismaClient {
+export class ProductsService {
   private readonly logger = new Logger('ProductService');
 
-  // constructor(
-  //   private readonly categoriesService: CategoryService,
-  // ) {}
+  constructor(
+    // private readonly categoriesService: CategoryService,
+    private readonly prisma: PrismaService
+  ) {}
 
-  async onModuleInit() {
-    await this.$connect();
-    this.logger.log('Database Connected');
-  }
 
   async create(createProductDto: CreateProductDto) {
     try {
@@ -22,7 +19,7 @@ export class ProductsService extends PrismaClient {
       //   createProductDto.categoryId,
       // );
 
-      return this.product.create({
+      return this.prisma.product.create({
         data: createProductDto,
       });
     } catch (error) {
@@ -31,7 +28,7 @@ export class ProductsService extends PrismaClient {
   }
 
   async findAll() {
-    return await this.product.findMany({
+    return await this.prisma.product.findMany({
       where: { available: true },
       include: {
         category: true,
@@ -40,7 +37,7 @@ export class ProductsService extends PrismaClient {
   }
 
   async findOne(id: number) {
-    const product = await this.product.findFirst({
+    const product = await this.prisma.product.findFirst({
       where: { id, available: true },
       include: {
         category: true,
@@ -56,7 +53,7 @@ export class ProductsService extends PrismaClient {
   async update(id: number, data: UpdateProductDto) {
     await this.findOne(id);
 
-    return this.product.update({
+    return this.prisma.product.update({
       where: { id },
       data,
     });
@@ -65,7 +62,7 @@ export class ProductsService extends PrismaClient {
   async remove(id: number) {
     await this.findOne(id);
 
-    const product = await this.product.update({
+    const product = await this.prisma.product.update({
       where: { id },
       data: {
         available: false,
