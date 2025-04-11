@@ -15,7 +15,7 @@ datasource db {
 
 model Category {
   id       Int       @id @default(autoincrement())
-  name     String    @unique
+  name     String
   products Product[]
 }
 
@@ -105,4 +105,4 @@ enum OrderStatus {
   shipped
   delivered
   cancelled
-} 
+}
