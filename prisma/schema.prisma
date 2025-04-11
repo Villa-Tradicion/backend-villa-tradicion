@@ -14,26 +14,26 @@ datasource db {
 }
 
 model Category {
-  id       Int      @id @default(autoincrement())
-  name     String   @unique
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
   products Product[]
 }
 
 model Product {
-  id              Int   @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   name            String
   description     String?
   price           Float
-  available       Boolean  @default(true)
+  available       Boolean       @default(true)
   heightCm        Float?
   widthCm         Float?
   depthCm         Float?
   materials       String[]
   availableColors String[]
   imageUrl        String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  category        Category @relation(fields: [categoryId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  category        Category      @relation(fields: [categoryId], references: [id])
   categoryId      Int
   orderDetails    OrderDetail[]
   reviews         Review[]
@@ -52,26 +52,26 @@ model User {
 }
 
 model Address {
-  id        String @id @default(uuid())
-  street    String
-  city      String
-  state     String
+  id         String @id @default(uuid())
+  street     String
+  city       String
+  state      String
   postalCode String
-  country   String
-  user      User   @relation(fields: [userId], references: [id])
-  userId    String
+  country    String
+  user       User   @relation(fields: [userId], references: [id])
+  userId     String
 }
 
 model Order {
-  id        String      @id @default(uuid())
-  total     Float
-  totalItems  Int
-  status    OrderStatus
+  id           String        @id @default(uuid())
+  total        Float
+  totalItems   Int
+  status       OrderStatus
   orderDetails OrderDetail[]
-  orderDate DateTime    @default(now())
-  updaterdAt DateTime @updatedAt
-  user      User        @relation(fields: [userId], references: [id])
-  userId    String
+  orderDate    DateTime      @default(now())
+  updaterdAt   DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
 }
 
 model OrderDetail {
@@ -85,13 +85,13 @@ model OrderDetail {
 }
 
 model Review {
-  id         String  @id @default(uuid())
+  id         String   @id @default(uuid())
   rating     Int
   comment    String?
   reviewDate DateTime @default(now())
-  product    Product @relation(fields: [productId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
   productId  Int
-  user       User    @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
   userId     String
 }
 
@@ -105,4 +105,4 @@ enum OrderStatus {
   shipped
   delivered
   cancelled
-}
+} 
