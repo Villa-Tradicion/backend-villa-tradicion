@@ -1,26 +1,23 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaService } from 'src/prisma-service/prisma-service.service';
 
 @Injectable()
-export class CategoryService extends PrismaClient{
+export class CategoryService{
   private readonly logger = new Logger('ProductService')
   
-  
-  async onModuleInit(){
-    await this.$connect();
-    this.logger.log('Database Connected')
-  }
+  constructor(private readonly prisma:PrismaService){}
+ 
   
   create(createCategoryDto: CreateCategoryDto) {
-    return this.category.create({
+    return this.prisma.category.create({
       data: createCategoryDto
     })
   }
 
   async findAll() {
-    return await this.category.findMany({
+    return await this.prisma.category.findMany({
       select: {
         id: true,
         name: true,
@@ -29,7 +26,7 @@ export class CategoryService extends PrismaClient{
   }
 
   async findOne(id: number) {
-    const category = await this.category.findFirst({
+    const category = await this.prisma.category.findFirst({
       where: {id}
     });
 
