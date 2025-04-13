@@ -20,7 +20,7 @@ export class CategoryService {
 
   async create(createCategoryDto: CreateCategoryDto) {
     // Validamos si ya existe una categoría con ese nombre
-    await this.validateCategoryNameUnique(createCategoryDto);
+    await this.validateCategoryNameUnique(createCategoryDto.name);
     try {
       return this.prisma.category.create({
         data: createCategoryDto,
@@ -32,14 +32,16 @@ export class CategoryService {
     }
   }
 
-  private async validateCategoryNameUnique(createCategoryDto: CreateCategoryDto) {
+  private async validateCategoryNameUnique(
+    name: string,
+  ) {
     const existingCategory = await this.prisma.category.findFirst({
-      where: { name: createCategoryDto.name },
+      where: { name: name },
     });
 
     if (existingCategory) {
       throw new ConflictException(
-        `La categoría "${createCategoryDto.name}" ya existe. Por favor asigna otro nombre.`
+        `La categoría "${name}" ya existe. Por favor asigna otro nombre.`,
       );
     }
   }
@@ -64,11 +66,20 @@ export class CategoryService {
     return category;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
-  }
+  async update(id: number, data: UpdateCategoryDto) {
+    await this.validateCategoryNameUnique(data.name);
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+    try {
+
+      return this.prisma.category.update({
+        where:{id},
+        data
+      });
+
+    } catch (error: any) {
+      this.logger.error('Error al crear la categoria', error.stack);
+      // Si es otro error interno, lanzamos una excepción genérica
+      throw new InternalServerErrorException('No se pudo crear la categoria');
+    }
   }
 }
