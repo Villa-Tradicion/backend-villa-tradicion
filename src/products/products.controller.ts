@@ -35,11 +35,6 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
   ) {
-    //Validamos el maximo de imagenes que se pueden subir por producto
-    const max = 5;
-    if (images.length > max) {
-      throw new BadRequestException(`Solo se permiten máximo ${max} imágenes.`);
-    }
     return this.productsService.create(createProductDto, images);
   }
 
