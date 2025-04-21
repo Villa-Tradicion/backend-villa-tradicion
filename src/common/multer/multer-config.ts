@@ -1,9 +1,8 @@
-// src/common/multer/multer-config.ts
-import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+// Corrige esta importación si es necesario
 import { HttpException, HttpStatus } from '@nestjs/common';
-import multer from 'multer';
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+import * as multer from 'multer';
 
-// Para manejar los archivos en memoria en lugar de guardarlos en disco
 export const memoryStorage: MulterOptions = {
   storage: multer.memoryStorage(),
   fileFilter: (req, file, callback) => {

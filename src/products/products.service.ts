@@ -25,7 +25,7 @@ export class ProductsService {
   ) {
     try {
       await this.categoriesService.findOne(createProductDto.categoryId);
-
+      
       let imageUrl = null;
       if (image) {
         imageUrl = await this.fileService.uploadFile(image);

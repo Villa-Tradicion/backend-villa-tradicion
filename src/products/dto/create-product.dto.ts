@@ -52,10 +52,7 @@ export class CreateProductDto {
   @IsString({ each: true })
   public availableColors: string[];
 
-  @IsOptional()
-  @IsUrl()
-  public imageUrl?: string;
-
-  @IsInt()
+  @IsNumber()
+  @Type(() => Number)
   public categoryId: number;
 }

@@ -22,14 +22,9 @@ export class FilesService {
 
   async uploadFile(
     file: Express.Multer.File,
-    folder: string = 'villa-tradicion',
+    folder: string = `media-villa-tradicion`,
   ): Promise<string> {
     try {
-
-      // Generar un UUID para el nombre del archivo
-      // const fileExtension = file.originalname.split('.').pop();
-      // const fileName = `${folder}/${uuidv4()}.${fileExtension}`;
-
       const fileName = `${folder}/${Date.now()}-${file.originalname.replace(/\s/g, '_')}`;
 
       const command = new PutObjectCommand({
@@ -37,8 +32,6 @@ export class FilesService {
         Key: fileName,
         Body: file.buffer,
         ContentType: file.mimetype,
-        // Añadir configuración para acceso público de lectura
-        // ACL: 'public-read'
       });
 
       await this.s3Client.send(command);
