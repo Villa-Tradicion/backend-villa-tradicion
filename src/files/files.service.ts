@@ -49,6 +49,16 @@ export class FilesService {
     }
   }
 
+  async uploadMultipleFiles(files: Express.Multer.File[], folder: string = 'products'): Promise<string[]> {
+    try {
+      const uploadPromises = files.map(file => this.uploadFile(file, folder));
+      return await Promise.all(uploadPromises);
+    } catch (error) {
+      this.logger.error(`Error al subir múltiples archivos a S3: ${error.message}`, error.stack);
+      throw error;
+    }
+  }
+
   async deleteFile(fileUrl: string): Promise<void> {
     try {
       // Extraer el key del archivo desde la URL

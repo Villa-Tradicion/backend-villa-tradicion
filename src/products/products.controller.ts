@@ -8,6 +8,9 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
+  UploadedFiles,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -16,21 +19,22 @@ import { ValidRoles } from 'src/auth/interfaces';
 import { JwtAuthGuard, RolesGuard } from 'src/auth/guard';
 import { RoleProtected } from 'src/auth/decorators/role-protected.decorator';
 import { UseGuards } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'src/common/multer/multer-config';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FilesInterceptor('images',5,memoryStorage))
   // @RoleProtected(ValidRoles.admin)
   // @UseGuards(JwtAuthGuard, RolesGuard)
   create(
     @Body() createProductDto: CreateProductDto,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFiles() images: Express.Multer.File[],
   ) {
-    return this.productsService.create(createProductDto, image);
+    return this.productsService.create(createProductDto, images);
   }
 
   @Get()
@@ -61,3 +65,4 @@ export class ProductsController {
     return this.productsService.remove(+id);
   }
 }
+

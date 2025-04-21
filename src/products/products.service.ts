@@ -21,19 +21,41 @@ export class ProductsService {
 
   async create(
     createProductDto: CreateProductDto,
-    image?: Express.Multer.File,
+    images?: Express.Multer.File[],
   ) {
     try {
       await this.categoriesService.findOne(createProductDto.categoryId);
-      
-      let imageUrl = null;
-      if (image) {
-        imageUrl = await this.fileService.uploadFile(image);
+
+      // Crear el producto primero sin imágenes
+      const product = await this.prisma.product.create({
+        data: {
+          ...createProductDto,
+        },
+      });
+
+      // Si hay imágenes, subirlas y vincularlas al producto
+      if (images && images.length > 0) {
+        const imageUrls = await this.fileService.uploadMultipleFiles(images);
+        
+        // Crear registros de imágenes para el producto
+        await this.prisma.$transaction(
+          imageUrls.map((url, index) => 
+            this.prisma.productImage.create({
+              data: {
+                url,
+                isMain: index === 0, // La primera imagen es la principal
+                productId: product.id,
+              },
+            })
+          )
+        );
       }
 
-      return this.prisma.product.create({
-        data: { ...createProductDto, imageUrl },
+      return this.prisma.product.findUnique({
+        where: { id: product.id },
+        include: { images: true },
       });
+
     } catch (error) {
       this.logger.error('Error al crear producto', error.stack);
       // Si es una excepción esperada (como NotFound), la relanzamos
@@ -51,6 +73,7 @@ export class ProductsService {
       where: { available: true },
       include: {
         category: true,
+        images:true
       },
     });
   }
@@ -60,6 +83,7 @@ export class ProductsService {
       where: { id, available: true },
       include: {
         category: true,
+        images:true
       },
     });
 
@@ -69,7 +93,11 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: number, data: UpdateProductDto, image?: Express.Multer.File ) {
+  async update(
+    id: number,
+    data: UpdateProductDto,
+    image?: Express.Multer.File,
+  ) {
     const product = await this.findOne(id);
 
     try {
@@ -85,18 +113,20 @@ export class ProductsService {
 
       return this.prisma.product.update({
         where: { id },
-        data:{
+        data: {
           ...data,
           imageUrl,
         },
       });
-
     } catch (error) {
-      this.logger.error(`Error al actualizar producto: ${error.message}`, error.stack);
-      throw new InternalServerErrorException('No se pudo actualizar el producto');
+      this.logger.error(
+        `Error al actualizar producto: ${error.message}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException(
+        'No se pudo actualizar el producto',
+      );
     }
-
-    
   }
 
   async remove(id: number) {

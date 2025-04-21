@@ -5,7 +5,7 @@ import * as multer from 'multer';
 
 export const memoryStorage: MulterOptions = {
   storage: multer.memoryStorage(),
-  fileFilter: (req, file, callback) => {
+  fileFilter: (req, file, callback) => {    
     if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
       return callback(
         new HttpException(
