@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -96,27 +97,61 @@ export class ProductsService {
   async update(
     id: number,
     data: UpdateProductDto,
-    image?: Express.Multer.File,
+    images?: Express.Multer.File[],
   ) {
     const product = await this.findOne(id);
-
+  
     try {
-      let imageUrl = product.imageUrl;
-
-      // Si hay una nueva imagen, eliminar la anterior y subir la nueva
-      if (image) {
-        if (product.imageUrl) {
-          await this.fileService.deleteFile(product.imageUrl);
-        }
-        imageUrl = await this.fileService.uploadFile(image);
-      }
-
-      return this.prisma.product.update({
+      // 1. Actualizar la información básica del producto
+      const updatedProduct = await this.prisma.product.update({
         where: { id },
         data: {
           ...data,
-          imageUrl,
         },
+      });
+  
+      // 2. Procesar las imágenes si se proporcionan
+      if (images && images.length > 0) {
+        // Subir las nuevas imágenes
+        const imageUrls = await this.fileService.uploadMultipleFiles(images);
+        
+        // Determinar comportamiento de las imágenes
+        const existingImages = await this.prisma.productImage.findMany({
+          where: { productId: id }
+        });
+        
+        // Si ya hay imágenes existentes y hay nuevas imágenes
+        if (existingImages.length > 0) {
+          // Opción 1: Eliminar todas las imágenes existentes y crear nuevas
+          // Eliminar físicamente las imágenes de S3
+          await Promise.all(
+            existingImages.map(img => this.fileService.deleteFile(img.url))
+          );
+          
+          // Eliminar registros de la base de datos
+          await this.prisma.productImage.deleteMany({
+            where: { productId: id }
+          });
+        }
+        
+        // Crear registros para las nuevas imágenes
+        await this.prisma.$transaction(
+          imageUrls.map((url, index) => 
+            this.prisma.productImage.create({
+              data: {
+                url,
+                isMain: index === 0, // La primera imagen es la principal
+                productId: id,
+              },
+            })
+          )
+        );
+      }
+  
+      // Retornar el producto actualizado con sus imágenes
+      return this.prisma.product.findUnique({
+        where: { id },
+        include: { images: true },
       });
     } catch (error) {
       this.logger.error(
