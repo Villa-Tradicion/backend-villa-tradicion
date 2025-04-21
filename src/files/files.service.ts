@@ -49,7 +49,7 @@ export class FilesService {
     }
   }
 
-  async uploadMultipleFiles(files: Express.Multer.File[], folder: string): Promise<string[]> {
+  async uploadMultipleFiles(files: Express.Multer.File[], folder: string="media-villa-tradicion"): Promise<string[]> {
     try {
       const uploadPromises = files.map(file => this.uploadFile(file, folder));
       return await Promise.all(uploadPromises);

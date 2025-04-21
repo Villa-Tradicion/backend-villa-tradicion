@@ -1,7 +1,7 @@
 // product-images/product-images.service.ts
 import { Injectable, Logger, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { FilesService } from '../files/files.service';
+import { FilesService } from 'src/files/files.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ProductImagesService {
