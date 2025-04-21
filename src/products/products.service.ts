@@ -1,27 +1,39 @@
-import { Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CategoryService } from 'src/category/category.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { FilesService } from 'src/files/files.service';
 @Injectable()
 export class ProductsService {
   private readonly logger = new Logger('ProductService');
 
   constructor(
     private readonly categoriesService: CategoryService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
+    private fileService: FilesService,
   ) {}
 
-
-  async create(createProductDto: CreateProductDto) {
+  async create(
+    createProductDto: CreateProductDto,
+    image?: Express.Multer.File,
+  ) {
     try {
-
       await this.categoriesService.findOne(createProductDto.categoryId);
 
-      return this.prisma.product.create({
-        data: createProductDto,
-      });
+      let imageUrl = null;
+      if (image) {
+        imageUrl = await this.fileService.uploadFile(image);
+      }
 
+      return this.prisma.product.create({
+        data: { ...createProductDto, imageUrl },
+      });
     } catch (error) {
       this.logger.error('Error al crear producto', error.stack);
       // Si es una excepción esperada (como NotFound), la relanzamos
@@ -57,13 +69,34 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: number, data: UpdateProductDto) {
-    await this.findOne(id);
+  async update(id: number, data: UpdateProductDto, image?: Express.Multer.File ) {
+    const product = await this.findOne(id);
 
-    return this.prisma.product.update({
-      where: { id },
-      data,
-    });
+    try {
+      let imageUrl = product.imageUrl;
+
+      // Si hay una nueva imagen, eliminar la anterior y subir la nueva
+      if (image) {
+        if (product.imageUrl) {
+          await this.fileService.deleteFile(product.imageUrl);
+        }
+        imageUrl = await this.fileService.uploadFile(image);
+      }
+
+      return this.prisma.product.update({
+        where: { id },
+        data:{
+          ...data,
+          imageUrl,
+        },
+      });
+
+    } catch (error) {
+      this.logger.error(`Error al actualizar producto: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('No se pudo actualizar el producto');
+    }
+
+    
   }
 
   async remove(id: number) {
