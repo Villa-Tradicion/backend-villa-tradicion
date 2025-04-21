@@ -20,23 +20,34 @@ model Category {
 }
 
 model Product {
-  id              Int           @id @default(autoincrement())
+  id              Int            @id @default(autoincrement())
   name            String
   description     String?
   price           Float
-  available       Boolean       @default(true)
+  available       Boolean        @default(true)
   heightCm        Float?
   widthCm         Float?
   depthCm         Float?
   materials       String[]
   availableColors String[]
-  imageUrl        String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  category        Category      @relation(fields: [categoryId], references: [id])
+  // imageUrl        String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  category        Category       @relation(fields: [categoryId], references: [id])
   categoryId      Int
   orderDetails    OrderDetail[]
   reviews         Review[]
+  images          ProductImage[]
+}
+
+// Nuevo modelo para las imágenes
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  isMain    Boolean  @default(false) // Para indicar la imagen principal
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  createdAt DateTime @default(now())
 }
 
 model User {
