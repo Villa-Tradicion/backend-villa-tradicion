@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, Logger, NotFoundException } f
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CategoryService } from 'src/category/category.service';
-import { PrismaService } from 'src/prisma-service/prisma-service.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class ProductsService {
   private readonly logger = new Logger('ProductService');
