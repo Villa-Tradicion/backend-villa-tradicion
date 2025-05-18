@@ -57,7 +57,7 @@ Se utiliza el formato `<tipo>: <descripción breve>`:
 - `docs:update-changelog`
 
 
-### ♻️ Refactorización `(refactor:`)
+### ♻️ Refactorización (`refactor:`)
 - `refactor:rename-variable`
 - `refactor:reorganize-services`
 - `refactor:simplify-function`

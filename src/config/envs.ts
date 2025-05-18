@@ -4,13 +4,12 @@ import * as joi from 'joi';
 interface EnvVars {
   PORT: number;
   DATABASE_URL: string;
-  
+
   JWT_SECRET: string;
 
-  AWS_REGION: string;
-  AWS_ACCESS_KEY_ID: string;
-  AWS_SECRET_ACCESS_KEY: string;
-  AWS_BUCKET_NAME: string;
+  CLOUDINARY_CLOUD_NAME: string;
+  CLOUDINARY_API_KEY: string;
+  CLOUDINARY_API_SECRET: string;
 }
 
 const envsSchema = joi
@@ -20,10 +19,9 @@ const envsSchema = joi
 
     JWT_SECRET: joi.string().required(),
 
-    AWS_REGION: joi.string().required(),
-    AWS_ACCESS_KEY_ID: joi.string().required(),
-    AWS_SECRET_ACCESS_KEY: joi.string().required(),
-    AWS_BUCKET_NAME: joi.string().required(),
+    CLOUDINARY_CLOUD_NAME: joi.string().required(),
+    CLOUDINARY_API_KEY: joi.string().required(),
+    CLOUDINARY_API_SECRET: joi.string().required(),
   })
   .unknown();
 
@@ -39,8 +37,9 @@ export const envs = {
 
   jwtSecret: envVars.JWT_SECRET,
 
-  awsRegion: envVars.AWS_REGION,
-  awsAccessKeyId: envVars.AWS_ACCESS_KEY_ID,
-  awsSecretAccessKey: envVars.AWS_SECRET_ACCESS_KEY,
-  awsBucketName: envVars.AWS_BUCKET_NAME,
+  cloudinary: {
+    cloudName: envVars.CLOUDINARY_CLOUD_NAME,
+    apiKey: envVars.CLOUDINARY_API_KEY,
+    apiSecret: envVars.CLOUDINARY_API_SECRET,
+  },
 };

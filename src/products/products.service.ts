@@ -9,7 +9,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CategoryService } from '../category/category.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { ProductImagesService } from '../product-images/product-images.service';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class ProductsService {
@@ -18,12 +18,12 @@ export class ProductsService {
   constructor(
     private readonly categoriesService: CategoryService,
     private readonly prisma: PrismaService,
-    private readonly productImagesService: ProductImagesService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async create(
     createProductDto: CreateProductDto,
-    images?: Express.Multer.File[],
+    files?: Express.Multer.File[],
   ) {
     try {
       await this.categoriesService.findOne(createProductDto.categoryId);
@@ -36,11 +36,12 @@ export class ProductsService {
       });
 
       // Si hay imágenes, usar el servicio especializado para añadirlas
-      if (images && images.length > 0) {
-        await this.productImagesService.addImagesToProduct(product.id, images);
+      if (files && files.length > 0) {
+        await this.cloudinaryService.addMediaToProduct(product.id, files);
       }
 
       return this.findOne(product.id);
+      
     } catch (error) {
       this.logger.error('Error al crear producto', error.stack);
       if (error instanceof NotFoundException) {
@@ -55,7 +56,7 @@ export class ProductsService {
       where: { available: true },
       include: {
         category: true,
-        images: true
+        files: true,
       },
     });
   }
@@ -65,7 +66,7 @@ export class ProductsService {
       where: { id, available: true },
       include: {
         category: true,
-        images: true
+        files: true,
       },
     });
 
@@ -78,7 +79,7 @@ export class ProductsService {
   async update(
     id: number,
     data: UpdateProductDto,
-    images?: Express.Multer.File[],
+    files?: Express.Multer.File[],
   ) {
     // Verificar que el producto existe
     await this.findOne(id);
@@ -91,11 +92,12 @@ export class ProductsService {
       });
 
       // Si se proporcionaron imágenes, reemplazar las existentes
-      if (images && images.length > 0) {
-        await this.productImagesService.replaceProductImages(id, images);
+      if (files && files.length > 0) {
+        await this.cloudinaryService.replaceProductMedia(id, files);
       }
 
       return this.findOne(id);
+      
     } catch (error) {
       this.logger.error(
         `Error al actualizar producto: ${error.message}`,
